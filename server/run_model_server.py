@@ -3,6 +3,7 @@ import numpy as np
 import settings
 import helpers
 import redis
+import base64
 import time
 import json
 import tensorflow as tf

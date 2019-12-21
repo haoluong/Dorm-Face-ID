@@ -44,25 +44,25 @@ def predict():
 	# initialize the data dictionary that will be returned from the
 	# view
 	data = {"success": False}
-	print(flask.request.files.get("image"))
 	# ensure an image was properly uploaded to our endpoint
 	if flask.request.method == "POST":
 		if flask.request.files.get("image"):
 			# read the image in PIL format and prepare it for
 			# classification
 			image = flask.request.files["image"].read()
-			image = Image.open(io.BytesIO(image))
-			image = prepare_image(image,
-				(settings.IMAGE_WIDTH, settings.IMAGE_HEIGHT))
+			image = helpers.decode_image(image, settings.IMAGE_DTYPE, [settings.IMAGE_HEIGHT, settings.IMAGE_WIDTH])
+			# image = Image.open(io.BytesIO(image))
+			# image = prepare_image(image,
+			# 	(settings.IMAGE_WIDTH, settings.IMAGE_HEIGHT))
 
-			# ensure our NumPy array is C-contiguous as well,
-			# otherwise we won't be able to serialize it
-			image = image.copy(order="C")
+			# # ensure our NumPy array is C-contiguous as well,
+			# # otherwise we won't be able to serialize it
+			# image = image.copy(order="C")
 
 			# generate an ID for the classification then add the
 			# classification ID + image to the queue
 			k = str(uuid.uuid4())
-			image = helpers.base64_encode_image(image)
+			image = helpers.base64_encode_image(image.numpy())
 			d = {"id": k, "image": image}
 			db.rpush(settings.IMAGE_QUEUE, json.dumps(d))
 
